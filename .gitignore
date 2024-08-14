@@ -75,3 +75,4 @@ fig_production_figs/20240328/fbg18.png
 __pycache__/__init__.cpython-310.pyc
 __pycache__/live_production.cpython-310.pyc
 *.png
+*.pdf

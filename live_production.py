@@ -28,7 +28,7 @@ FIG_A = (90.0) / 25.4
 SAVE_DATA = True
 
 
-osa = Q8347(center=1018, span=15, high_resolution=True)
+osa = Q8347(center=1550, span=75, high_resolution=True)
 osa.read()
 
 wavelength_m = osa.wavelength_m

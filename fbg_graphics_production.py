@@ -31,7 +31,7 @@ FIG_A = FIG_L / 1.6
 
 
 def plot_production_one_column(date: str) -> None:
-    f = h5py.File("production_file.hdf5", "r")
+    f = h5py.File("production_files.hdf5", "r")
     ff = f["fbg_production/" + date]
     # ff = f[date]
     # find index of fbgs
@@ -74,7 +74,7 @@ def plot_production_one_column(date: str) -> None:
     plt.close(fig=1)
 
 
-# plot_production_one_column('20231010')
+plot_production_one_column('20230913')
 
 
 def loop_graphics():
@@ -102,18 +102,18 @@ def plot_one_graphic(date: str, fbg_keys=[]):
     i = 0
     for i in fbg_keys:
         if i not in [
-            "fbg5",
-            "fbg15",
-            "fbg1",
-            "fbg13",
-            "fbg14",
-            "fbg8",  #
-            "fbg6",
-            "fbg9",
-            "fbg2",
-            "fbg16",
-            "fbg3",
-            "fbg17",
+            # "fbg5",
+            # "fbg15",
+            # "fbg1",
+            # "fbg13",
+            # "fbg14",
+            # "fbg8",  #
+            # "fbg6",
+            # "fbg9",
+            # "fbg2",
+            # "fbg16",
+            # "fbg3",
+            # "fbg17",
         ]:
             index_min, index_max = find_index_of_x_span(
                 1540e-9, 1560e-9, ff[i + "/wavelength_m"][:]
@@ -144,7 +144,9 @@ def plot_one_graphic(date: str, fbg_keys=[]):
 
 
 # plot_one_graphic("20231130",fbg_keys=["fbg4","fbg9"])
-plot_one_graphic(date="20240207")
+# plot_one_graphic(date="20240207")
+# plot_one_graphic(date="20231031")
+plot_one_graphic(date="20230913")
 
 
 def plot_one_graphic_2(date="20240328", fbg_keys=[]):
@@ -201,7 +203,7 @@ def remove_wrong_data(file_name: str, last_index: int, data_name: str):
     f.close()
 
 
-remove_wrong_data("production_files.hdf5",20,"fbg_production/20240207/fbg3")
+remove_wrong_data("production_files.hdf5",7,"fbg_production/20230913/fbg2")
 
 
 def plot_graphics_with_pairs_acc_3():

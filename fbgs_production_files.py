@@ -311,3 +311,7 @@ def remove_wrong_data(date='', fbg_number=''):
     del ff['reflectivity']
     ff['reflectivity'] = a[:,:12]
     f.close()
+
+
+
+f.keys()
