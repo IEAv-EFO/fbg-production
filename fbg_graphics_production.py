@@ -9,6 +9,7 @@
 """
 
 import locale
+from os import sep
 
 import h5py
 import matplotlib.axes
@@ -247,15 +248,12 @@ def plot_graphics_with_pairs_acc_4():
             plot_color,
             label=_fbg_name.upper() + " " + _fbg_number,alpha=0.66
         )
-        # ax.plot(
-        #     ff[fbg_number + "/wavelength_m"][:] * 1e9 - delta_lambda,
-        #     ff[fbg_number + "/reflectivity"][:, -1],
-        #     plot_color,
-        #     alpha=0.33,
+        # save files to csv for sakamoto
+        # np.savetxt(
+        #     "fbg_production/data_accel_4_csv/reflectivity/"+fbg_number+".csv",
+        #     np.column_stack((ff[fbg_number + "/wavelength_m"][:],
+        #         ff[fbg_number + "/reflectivity"][:, -1])),delimiter=','
         # )
-        
-        # ax.plot(delta_lambda+ff[fbg_number + "/wavelength_m"][:] * 1e9,
-        #     ff[fbg_number + "/reflectivity"][:, -1],plot_color)
         ax.legend()
 
     f = h5py.File("./production_files.hdf5", "r")
