@@ -76,3 +76,4 @@ __pycache__/__init__.cpython-310.pyc
 __pycache__/live_production.cpython-310.pyc
 *.png
 *.pdf
+*.pyc

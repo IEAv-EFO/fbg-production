@@ -9,26 +9,66 @@
 """
 
 import locale
-from os import sep
 
 import h5py
 import matplotlib.axes
 import matplotlib.pyplot as plt
 import matplotlib
-import numpy as np
 import pandas as pd
 import regex
 from natsort import natsorted
 from scipy.signal import butter, lfilter
-
 from common_functions.generic_functions import find_index_of_x_span
 
+TESE_FOLDER = "../tese/images/not_used_on_thesis/"
 locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
 plt.style.use("common_functions/roney3.mplstyle")
 my_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 FIG_L = 6.29
 FIG_A = FIG_L / 1.6
 # header
+
+common_labels = {
+    "x": r"$\mathbf{x}$",
+    "y": r"$\mathbf{y}$",
+    "z": r"$\mathbf{z}$",
+    "m_per_ss": r"$[\si{\m\per\s\squared}]$",
+}
+
+plot_text = {
+    "pt": {
+        "temperature": r"Temperatura $\si{\celsius}$",
+        "calibrated": "Calibrado",
+        "uncalibrated": "Nao calibrado",
+        "digital_count": "Contador digital (12 $\\si{\\bit}$)",
+        "normalized_y_axis": "Contador digital normalizado \n pela referência de potência",
+        "samples": "Amostras",
+        "reference_power": "Referência de potência",
+        "complement_save_name": "tese",
+        "digital_counts_unit": "contagens",
+        "locale": "pt_BR.UTF-8",
+        "time_s": r"Tempo $[\si{\s}]$",
+        "time_h": r"Tempo $[\si{\h}]$",
+        "time_m": r"Tempo $[\si{\m}]$",
+        "reflectivity_percent": r"Refletividade $[\si{\percent}]$",
+    },
+    "en": {
+        "temperature": "Temperature $\\si{\\celsius}$",
+        "calibrated": "Calibrated",
+        "uncalibrated": "Not calibrated",
+        "digital_count": "Digital count (12 $\\si{\\bit}$)",
+        "normalized_y_axis": "Digital count normalized by \n the reference power",
+        "samples": "Samples",
+        "reference_power": "Reference power",
+        "complement_save_name": "papers",
+        "digital_counts_unit": "counts",
+        "locale": "en_US.UTF-8",
+        "time_s": r"Time $[\si{\s}]$",
+        "time_h": r"Time $[\si{\h}]$",
+        "time_m": r"Time $[\si{\m}]$",
+        "reflectivity_percent": r"Reflectivity $[\si{\percent}]$",
+    },
+}
 
 
 def plot_production_one_column(date: str) -> None:
@@ -75,7 +115,7 @@ def plot_production_one_column(date: str) -> None:
     plt.close(fig=1)
 
 
-plot_production_one_column('20230913')
+plot_production_one_column("20230913")
 
 
 def loop_graphics():
@@ -204,7 +244,7 @@ def remove_wrong_data(file_name: str, last_index: int, data_name: str):
     f.close()
 
 
-remove_wrong_data("production_files.hdf5",7,"fbg_production/20230913/fbg2")
+remove_wrong_data("production_files.hdf5", 7, "fbg_production/20230913/fbg2")
 
 
 def plot_graphics_with_pairs_acc_3():
@@ -231,22 +271,44 @@ def plot_graphics_with_pairs_acc_3():
     plot_fbg(ax[2], fbg_number="fbg1")
     plot_fbg(ax[2], fbg_number="fbg13")
     plt.show()
-    plt.savefig("../tese/images/fbg_acc_3.pdf", format="pdf")
+    plt.savefig(TESE_FOLDER+"fbg_acc_3.pdf", format="pdf")
     plt.close(fig=2)
 
 
-def plot_graphics_with_pairs_acc_4():
+def plot_graphics_with_pairs_acc_4(language: str):
     """plot_graphics_with_pairs_acc_3 plot graphics of fbgs used on acc 3."""
     # def plot_min_max_deformation(ax:plt.axes,)
-    def plot_fbg(ax: matplotlib.axes._axes.Axes, fbg_number: str, ff, delta_lambda:float,plot_color:str):
+    local_plot_text = {
+        lang:{**common_labels,**plot_text[lang]}
+        for lang in plot_text
+        }
+    texts = local_plot_text[language]
+    locale.setlocale(locale.LC_ALL,  texts["locale"])
+    label_dict = {
+        "fbg3": "fbg1",
+        "fbg11": "fbg4",
+        "fbg9": "fbg5",
+        "fbg7":"fbg8",
+        "fbg2": "fbg9",
+        "fbg17": "fbg12",
+    }
+    def plot_fbg(
+        
+        ax: matplotlib.axes._axes.Axes,
+        fbg_number: str,
+        ff,
+        delta_lambda: float,
+        plot_color: str,
+    ):
         _fbg_name = regex.findall(r"[a-zA-Z]+", fbg_number)[0]
-        _fbg_number = regex.findall(r"(\d+)", fbg_number)[0]
+        _fbg_number = regex.findall(r"(\d+)", label_dict[fbg_number])[0]
 
         ax.plot(
             ff[fbg_number + "/wavelength_m"][:] * 1e9,
             ff[fbg_number + "/reflectivity"][:, -1],
             plot_color,
-            label=_fbg_name.upper() + " " + _fbg_number,alpha=0.66
+            label=_fbg_name.upper() + " " + _fbg_number,
+            alpha=0.66,
         )
         # save files to csv for sakamoto
         # np.savetxt(
@@ -260,23 +322,29 @@ def plot_graphics_with_pairs_acc_4():
     ff = f["fbg_production/20240207"]
     fff = f["fbg_production/20231130"]
 
-    plt.close(fig=2)
     fig, ax = plt.subplots(3, 1, num=2, sharex=True, figsize=(FIG_L, FIG_L * 0.75))
     # fbg5 fbg15
     fig.supxlabel(r"$\lambda [\unit{\nm}]$")
-    fig.supylabel(r"Refletividade $[\unit{\percent}]$")
-    plot_fbg(ax[0], fbg_number="fbg3", ff=ff,delta_lambda=1.0,plot_color=my_colors[0])
-    plot_fbg(ax[0], fbg_number="fbg11", ff=ff, delta_lambda=-1.0, plot_color=my_colors[1])
-    plot_fbg(ax[1], fbg_number="fbg7", ff=fff, delta_lambda=1.0,plot_color=my_colors[0])
-    plot_fbg(ax[1], fbg_number="fbg9", ff=ff, delta_lambda=-1.0, plot_color=my_colors[1])
+    fig.supylabel(texts["reflectivity_percent"])
+    plot_fbg(ax[0], fbg_number="fbg3", ff=ff, delta_lambda=1.0, plot_color=my_colors[0])
+    plot_fbg(
+        ax[0], fbg_number="fbg11", ff=ff, delta_lambda=-1.0, plot_color=my_colors[1]
+    )
+    plot_fbg(
+        ax[1], fbg_number="fbg7", ff=fff, delta_lambda=1.0, plot_color=my_colors[0]
+    )
+    plot_fbg(
+        ax[1], fbg_number="fbg9", ff=ff, delta_lambda=-1.0, plot_color=my_colors[1]
+    )
     plot_fbg(ax[2], fbg_number="fbg2", ff=ff, delta_lambda=1.0, plot_color=my_colors[0])
-    plot_fbg(ax[2], fbg_number="fbg17", ff=ff, delta_lambda=-1.0, plot_color=my_colors[1])
-    ax[0].set_ylabel("x")
-    ax[1].set_ylabel("y")
-    ax[2].set_ylabel("z")
-    plt.show()
-    plt.savefig("../tese/images/fbg_acc_4.pdf", format="pdf")
-    plt.close()
+    plot_fbg(
+        ax[2], fbg_number="fbg17", ff=ff, delta_lambda=-1.0, plot_color=my_colors[1]
+    )
+    ax[0].set_ylabel(texts["x"])
+    ax[1].set_ylabel(texts["y"])
+    ax[2].set_ylabel(texts["z"])
+    plt.savefig(TESE_FOLDER+"fbg_acc_4_"+language+".pdf", format="pdf")
+    plt.close('all')
 
 
 def plot_graphics_with_pairs_acc_5():
@@ -301,7 +369,10 @@ def plot_graphics_with_pairs_acc_5():
     # fig.clear()
     fig, ax = plt.subplots(3, 1, num=5, sharex=True, figsize=(FIG_L, FIG_A))
     # fbg5 fbg15
-
+    label_dict = {
+        "fbg3" : "fb1",
+        "fbg17" : "fb2", 
+    }
     fig.supxlabel(r"$\lambda [\unit{\nm}]$")
     fig.supylabel(r"Refletividade $[\unit{\percent}]$")
     plot_fbg(ax[0], fbg_number="fbg3", ff=ff)
@@ -315,7 +386,7 @@ def plot_graphics_with_pairs_acc_5():
     ax[2].set_ylabel("z")
     ax[2].set_xlim(left=1545, right=1560)
     plt.show()
-    plt.savefig("../tese/images/fbg_acc_5.pdf", format="pdf")
+    plt.savefig(TESE_FOLDER+"fbg_acc_5.pdf", format="pdf")
     plt.close()
 
 
@@ -332,7 +403,7 @@ def plot_graphics_with_pairs_acc_6():
         ax.plot(
             ff[fbg_number + "/wavelength_m"][:] * 1e9,
             ff[fbg_number + "/reflectivity"][:, -1],
-            label=_fbg_name.upper() + " " + _fbg_number+",("+_data+")",
+            label=_fbg_name.upper() + " " + _fbg_number + ",(" + _data + ")",
         )
         ax.legend()
 
@@ -362,11 +433,12 @@ def plot_graphics_with_pairs_acc_6():
     # 20231130
     # plot_fbg(ax1, fbg_number="fbg14", ff=fff,data=fff.name.split('/')[-1])
     # 20240207
-    for i in [4,
-            #   7,
-              10,
-            #   12
-              ]:
+    for i in [
+        4,
+        #   7,
+        10,
+        #   12
+    ]:
         plot_fbg(ax1, fbg_number="fbg" + str(i), ff=ffff)
     plt.show()
     # fig.clear()
@@ -386,5 +458,5 @@ def plot_graphics_with_pairs_acc_6():
     ax[2].set_ylabel("z")
     ax[2].set_xlim(left=1545, right=1560)
     # plt.show()
-    plt.savefig("../tese/images/fbg_acc_6.pdf", format="pdf")
+    plt.savefig(TESE_FOLDER+"fbg_acc_6.pdf", format="pdf")
     plt.close()
