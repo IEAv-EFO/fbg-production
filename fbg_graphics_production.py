@@ -15,6 +15,7 @@ import matplotlib.axes
 import matplotlib.pyplot as plt
 import matplotlib
 import pandas as pd
+import numpy as np
 import regex
 from natsort import natsorted
 from scipy.signal import butter, lfilter
@@ -305,7 +306,7 @@ def plot_graphics_with_pairs_acc_4(language: str):
 
         ax.plot(
             ff[fbg_number + "/wavelength_m"][:] * 1e9,
-            ff[fbg_number + "/reflectivity"][:, -1],
+            np.abs(ff[fbg_number + "/reflectivity"][:, -1]),
             plot_color,
             label=_fbg_name.upper() + " " + _fbg_number,
             alpha=0.66,
@@ -340,9 +341,9 @@ def plot_graphics_with_pairs_acc_4(language: str):
     plot_fbg(
         ax[2], fbg_number="fbg17", ff=ff, delta_lambda=-1.0, plot_color=my_colors[1]
     )
-    ax[0].set_ylabel(texts["x"])
-    ax[1].set_ylabel(texts["y"])
-    ax[2].set_ylabel(texts["z"])
+    ax[0].set_title("Par do eixo " + texts["x"])
+    ax[1].set_title("Par do eixo " +texts["y"])
+    ax[2].set_title("Par do eixo " +texts["z"])
     plt.savefig(TESE_FOLDER+"fbg_acc_4_"+language+".pdf", format="pdf")
     plt.close('all')
 
